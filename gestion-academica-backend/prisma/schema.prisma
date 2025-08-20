@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Estudiante {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  apellido        String
+  documento       String   @unique
+  correo          String   @unique
+  fecha_nacimiento DateTime
+  estado          Boolean  @default(true)
+  creado_en       DateTime @default(now())
+  actualizado_en  DateTime @default(now())
+
+  @@map("estudiantes") // mapea este modelo a la tabla 'estudiantes' en la BD
+}
