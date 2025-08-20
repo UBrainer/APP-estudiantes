@@ -16,19 +16,35 @@ const client_1 = require("@prisma/client");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     static { PrismaService_1 = this; }
     static instance;
+    logger = new common_1.Logger(PrismaService_1.name);
     constructor() {
-        super();
+        super({
+            log: ['query', 'info', 'warn', 'error'],
+            errorFormat: 'pretty',
+        });
         if (!PrismaService_1.instance) {
             PrismaService_1.instance = this;
         }
         return PrismaService_1.instance;
     }
     async onModuleInit() {
-        await this.$connect();
-        console.log('✅ Conectado a la base de datos con Prisma (Singleton + NestJS)');
+        try {
+            await this.$connect();
+            this.logger.log('✅ Conectado a la base de datos con Prisma (Singleton)');
+        }
+        catch (error) {
+            this.logger.error('❌ Error conectando a la base de datos:', error);
+            throw error;
+        }
     }
     async onModuleDestroy() {
-        await this.$disconnect();
+        try {
+            await this.$disconnect();
+            this.logger.log('✅ Desconectado de la base de datos');
+        }
+        catch (error) {
+            this.logger.error('❌ Error desconectando de la base de datos:', error);
+        }
     }
 };
 exports.PrismaService = PrismaService;
