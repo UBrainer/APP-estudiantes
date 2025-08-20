@@ -1,11 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SearchContext } from './strategies/search.context';
+import { 
+  NameSearchStrategy, 
+  DocumentSearchStrategy, 
+  EmailSearchStrategy, 
+  StatusSearchStrategy 
+} from './strategies/search.strategy';
 
 @Injectable()
 export class EstudiantesService {
-  constructor(private readonly prisma: PrismaService) {}
+  private searchContext: SearchContext;
 
-  // Obtener todos los estudiantes
+  constructor(private readonly prisma: PrismaService) {
+    // Inicializar estrategias de búsqueda
+    const nameStrategy = new NameSearchStrategy(prisma);
+    const documentStrategy = new DocumentSearchStrategy(prisma);
+    const emailStrategy = new EmailSearchStrategy(prisma);
+    const statusStrategy = new StatusSearchStrategy(prisma);
+
+    this.searchContext = new SearchContext(
+      nameStrategy,
+      documentStrategy,
+      emailStrategy,
+      statusStrategy
+    );
+  }
+
+  // CRUD básico
   async findAll() {
     try {
       return await this.prisma.estudiante.findMany({
@@ -16,7 +38,6 @@ export class EstudiantesService {
     }
   }
 
-  // Obtener un estudiante por ID
   async findOne(id: number) {
     try {
       const estudiante = await this.prisma.estudiante.findUnique({ 
@@ -33,7 +54,6 @@ export class EstudiantesService {
     }
   }
 
-  // Crear un nuevo estudiante
   async create(data: {
     nombre: string;
     apellido: string;
@@ -71,7 +91,6 @@ export class EstudiantesService {
     }
   }
 
-  // Actualizar estudiante
   async update(id: number, data: any) {
     try {
       // Verificar que el estudiante existe
@@ -90,7 +109,6 @@ export class EstudiantesService {
     }
   }
 
-  // Desactivar estudiante (eliminación lógica)
   async remove(id: number) {
     try {
       const estudiante = await this.prisma.estudiante.update({
@@ -102,6 +120,39 @@ export class EstudiantesService {
     } catch (error) {
       throw new Error(`Error desactivando estudiante: ${error.message}`);
     }
+  }
+
+  // Búsquedas usando Strategy Pattern
+  async search(field: string, term: string): Promise<any[]> {
+    try {
+      return await this.searchContext.executeSearch(field, term);
+    } catch (error) {
+      throw new Error(`Error en búsqueda: ${error.message}`);
+    }
+  }
+
+  async searchAll(term: string): Promise<any[]> {
+    try {
+      return await this.searchContext.searchAll(term);
+    } catch (error) {
+      throw new Error(`Error en búsqueda general: ${error.message}`);
+    }
+  }
+
+  async filterByStatus(estado: boolean): Promise<any[]> {
+    try {
+      return await this.prisma.estudiante.findMany({
+        where: { estado },
+        orderBy: { nombre: 'asc' }
+      });
+    } catch (error) {
+      throw new Error(`Error filtrando por estado: ${error.message}`);
+    }
+  }
+
+  // Métodos auxiliares para el frontend
+  getSearchFields(): string[] {
+    return this.searchContext.getAvailableSearchFields();
   }
 
   // Método de validación básica
@@ -122,22 +173,6 @@ export class EstudiantesService {
     // Validar que la fecha sea válida
     if (isNaN(new Date(data.fecha_nacimiento).getTime())) {
       throw new Error('Fecha de nacimiento inválida');
-    }
-  }
-
-  // Método simple de búsqueda (luego lo convertiremos en Strategy)
-  async buscarPorNombre(nombre: string) {
-    try {
-      return await this.prisma.estudiante.findMany({
-        where: {
-          OR: [
-            { nombre: { contains: nombre, mode: 'insensitive' } },
-            { apellido: { contains: nombre, mode: 'insensitive' } }
-          ]
-        }
-      });
-    } catch (error) {
-      throw new Error(`Error en búsqueda: ${error.message}`);
     }
   }
 }

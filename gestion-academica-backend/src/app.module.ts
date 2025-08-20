@@ -4,7 +4,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { EstudiantesModule } from './estudiantes/estudiantes.module';
 
 @Module({
-  imports: [EstudiantesModule],
+  imports: [EstudiantesModule],  // ← ¡ESTA LÍNEA ES CRUCIAL!
   controllers: [AppController],
   providers: [PrismaService],
   exports: [PrismaService],

@@ -12,10 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EstudiantesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const search_context_1 = require("./strategies/search.context");
+const search_strategy_1 = require("./strategies/search.strategy");
 let EstudiantesService = class EstudiantesService {
     prisma;
+    searchContext;
     constructor(prisma) {
         this.prisma = prisma;
+        const nameStrategy = new search_strategy_1.NameSearchStrategy(prisma);
+        const documentStrategy = new search_strategy_1.DocumentSearchStrategy(prisma);
+        const emailStrategy = new search_strategy_1.EmailSearchStrategy(prisma);
+        const statusStrategy = new search_strategy_1.StatusSearchStrategy(prisma);
+        this.searchContext = new search_context_1.SearchContext(nameStrategy, documentStrategy, emailStrategy, statusStrategy);
     }
     async findAll() {
         try {
@@ -93,6 +101,36 @@ let EstudiantesService = class EstudiantesService {
             throw new Error(`Error desactivando estudiante: ${error.message}`);
         }
     }
+    async search(field, term) {
+        try {
+            return await this.searchContext.executeSearch(field, term);
+        }
+        catch (error) {
+            throw new Error(`Error en búsqueda: ${error.message}`);
+        }
+    }
+    async searchAll(term) {
+        try {
+            return await this.searchContext.searchAll(term);
+        }
+        catch (error) {
+            throw new Error(`Error en búsqueda general: ${error.message}`);
+        }
+    }
+    async filterByStatus(estado) {
+        try {
+            return await this.prisma.estudiante.findMany({
+                where: { estado },
+                orderBy: { nombre: 'asc' }
+            });
+        }
+        catch (error) {
+            throw new Error(`Error filtrando por estado: ${error.message}`);
+        }
+    }
+    getSearchFields() {
+        return this.searchContext.getAvailableSearchFields();
+    }
     validarDatosEstudiante(data) {
         const requiredFields = ['nombre', 'apellido', 'documento', 'correo', 'fecha_nacimiento'];
         const missingFields = requiredFields.filter(field => !data[field]);
@@ -105,21 +143,6 @@ let EstudiantesService = class EstudiantesService {
         }
         if (isNaN(new Date(data.fecha_nacimiento).getTime())) {
             throw new Error('Fecha de nacimiento inválida');
-        }
-    }
-    async buscarPorNombre(nombre) {
-        try {
-            return await this.prisma.estudiante.findMany({
-                where: {
-                    OR: [
-                        { nombre: { contains: nombre, mode: 'insensitive' } },
-                        { apellido: { contains: nombre, mode: 'insensitive' } }
-                    ]
-                }
-            });
-        }
-        catch (error) {
-            throw new Error(`Error en búsqueda: ${error.message}`);
         }
     }
 };

@@ -11,13 +11,23 @@ const common_1 = require("@nestjs/common");
 const estudiantes_service_1 = require("./estudiantes.service");
 const estudiantes_controller_1 = require("./estudiantes.controller");
 const prisma_service_1 = require("../prisma/prisma.service");
+const search_strategy_1 = require("./strategies/search.strategy");
+const search_context_1 = require("./strategies/search.context");
 let EstudiantesModule = class EstudiantesModule {
 };
 exports.EstudiantesModule = EstudiantesModule;
 exports.EstudiantesModule = EstudiantesModule = __decorate([
     (0, common_1.Module)({
         controllers: [estudiantes_controller_1.EstudiantesController],
-        providers: [estudiantes_service_1.EstudiantesService, prisma_service_1.PrismaService],
+        providers: [
+            estudiantes_service_1.EstudiantesService,
+            prisma_service_1.PrismaService,
+            search_strategy_1.NameSearchStrategy,
+            search_strategy_1.DocumentSearchStrategy,
+            search_strategy_1.EmailSearchStrategy,
+            search_strategy_1.StatusSearchStrategy,
+            search_context_1.SearchContext,
+        ],
         exports: [estudiantes_service_1.EstudiantesService],
     })
 ], EstudiantesModule);

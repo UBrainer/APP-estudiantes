@@ -20,58 +20,40 @@ let EstudiantesController = class EstudiantesController {
     constructor(estudiantesService) {
         this.estudiantesService = estudiantesService;
     }
-    async getAll() {
+    async search(campo, termino) {
         try {
-            return await this.estudiantesService.findAll();
-        }
-        catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    async getOne(id) {
-        try {
-            return await this.estudiantesService.findOne(Number(id));
-        }
-        catch (error) {
-            if (error.message === 'Estudiante no encontrado') {
-                throw new common_1.HttpException(error.message, common_1.HttpStatus.NOT_FOUND);
-            }
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    async create(data) {
-        try {
-            return await this.estudiantesService.create(data);
-        }
-        catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
-        }
-    }
-    async update(id, data) {
-        try {
-            return await this.estudiantesService.update(Number(id), data);
-        }
-        catch (error) {
-            if (error.message === 'Estudiante no encontrado') {
-                throw new common_1.HttpException(error.message, common_1.HttpStatus.NOT_FOUND);
-            }
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
-        }
-    }
-    async remove(id) {
-        try {
-            return await this.estudiantesService.remove(Number(id));
-        }
-        catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
-        }
-    }
-    async buscarPorNombre(query) {
-        try {
-            if (!query) {
+            if (!termino) {
                 throw new common_1.HttpException('Término de búsqueda requerido', common_1.HttpStatus.BAD_REQUEST);
             }
-            return await this.estudiantesService.buscarPorNombre(query);
+            return await this.estudiantesService.search(campo, termino);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async searchAll(termino) {
+        try {
+            if (!termino) {
+                throw new common_1.HttpException('Término de búsqueda requerido', common_1.HttpStatus.BAD_REQUEST);
+            }
+            return await this.estudiantesService.searchAll(termino);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async filterByStatus(estado) {
+        try {
+            const estadoBoolean = estado.toLowerCase() === 'true';
+            return await this.estudiantesService.filterByStatus(estadoBoolean);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getSearchFields() {
+        try {
+            return await this.estudiantesService.getSearchFields();
         }
         catch (error) {
             throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,47 +62,33 @@ let EstudiantesController = class EstudiantesController {
 };
 exports.EstudiantesController = EstudiantesController;
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('buscar/:campo'),
+    __param(0, (0, common_1.Param)('campo')),
+    __param(1, (0, common_1.Query)('termino')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
-], EstudiantesController.prototype, "getAll", null);
+], EstudiantesController.prototype, "search", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], EstudiantesController.prototype, "getOne", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], EstudiantesController.prototype, "create", null);
-__decorate([
-    (0, common_1.Put)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], EstudiantesController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], EstudiantesController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Get)('buscar/nombre'),
+    (0, common_1.Get)('buscar'),
     __param(0, (0, common_1.Query)('q')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], EstudiantesController.prototype, "buscarPorNombre", null);
+], EstudiantesController.prototype, "searchAll", null);
+__decorate([
+    (0, common_1.Get)('filtro/estado'),
+    __param(0, (0, common_1.Query)('estado')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "filterByStatus", null);
+__decorate([
+    (0, common_1.Get)('campos-busqueda'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "getSearchFields", null);
 exports.EstudiantesController = EstudiantesController = __decorate([
     (0, common_1.Controller)('estudiantes'),
     __metadata("design:paramtypes", [estudiantes_service_1.EstudiantesService])
