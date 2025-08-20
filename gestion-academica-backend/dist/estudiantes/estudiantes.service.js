@@ -17,20 +17,110 @@ let EstudiantesService = class EstudiantesService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    findAll() {
-        return this.prisma.estudiante.findMany();
+    async findAll() {
+        try {
+            return await this.prisma.estudiante.findMany({
+                orderBy: { creado_en: 'desc' }
+            });
+        }
+        catch (error) {
+            throw new Error(`Error obteniendo estudiantes: ${error.message}`);
+        }
     }
-    findOne(id) {
-        return this.prisma.estudiante.findUnique({ where: { id } });
+    async findOne(id) {
+        try {
+            const estudiante = await this.prisma.estudiante.findUnique({
+                where: { id }
+            });
+            if (!estudiante) {
+                throw new Error('Estudiante no encontrado');
+            }
+            return estudiante;
+        }
+        catch (error) {
+            throw new Error(`Error obteniendo estudiante: ${error.message}`);
+        }
     }
-    create(data) {
-        return this.prisma.estudiante.create({ data });
+    async create(data) {
+        try {
+            this.validarDatosEstudiante(data);
+            const existe = await this.prisma.estudiante.findFirst({
+                where: {
+                    OR: [
+                        { documento: data.documento },
+                        { correo: data.correo }
+                    ]
+                }
+            });
+            if (existe) {
+                throw new Error('Ya existe un estudiante con ese documento o correo');
+            }
+            return await this.prisma.estudiante.create({
+                data: {
+                    ...data,
+                    estado: true,
+                }
+            });
+        }
+        catch (error) {
+            throw new Error(`Error creando estudiante: ${error.message}`);
+        }
     }
-    update(id, data) {
-        return this.prisma.estudiante.update({ where: { id }, data });
+    async update(id, data) {
+        try {
+            const existe = await this.prisma.estudiante.findUnique({ where: { id } });
+            if (!existe) {
+                throw new Error('Estudiante no encontrado');
+            }
+            return await this.prisma.estudiante.update({
+                where: { id },
+                data: { ...data, actualizado_en: new Date() }
+            });
+        }
+        catch (error) {
+            throw new Error(`Error actualizando estudiante: ${error.message}`);
+        }
     }
-    remove(id) {
-        return this.prisma.estudiante.delete({ where: { id } });
+    async remove(id) {
+        try {
+            const estudiante = await this.prisma.estudiante.update({
+                where: { id },
+                data: { estado: false, actualizado_en: new Date() }
+            });
+            return { message: 'Estudiante desactivado correctamente', estudiante };
+        }
+        catch (error) {
+            throw new Error(`Error desactivando estudiante: ${error.message}`);
+        }
+    }
+    validarDatosEstudiante(data) {
+        const requiredFields = ['nombre', 'apellido', 'documento', 'correo', 'fecha_nacimiento'];
+        const missingFields = requiredFields.filter(field => !data[field]);
+        if (missingFields.length > 0) {
+            throw new Error(`Campos requeridos faltantes: ${missingFields.join(', ')}`);
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.correo)) {
+            throw new Error('Formato de correo electrónico inválido');
+        }
+        if (isNaN(new Date(data.fecha_nacimiento).getTime())) {
+            throw new Error('Fecha de nacimiento inválida');
+        }
+    }
+    async buscarPorNombre(nombre) {
+        try {
+            return await this.prisma.estudiante.findMany({
+                where: {
+                    OR: [
+                        { nombre: { contains: nombre, mode: 'insensitive' } },
+                        { apellido: { contains: nombre, mode: 'insensitive' } }
+                    ]
+                }
+            });
+        }
+        catch (error) {
+            throw new Error(`Error en búsqueda: ${error.message}`);
+        }
     }
 };
 exports.EstudiantesService = EstudiantesService;

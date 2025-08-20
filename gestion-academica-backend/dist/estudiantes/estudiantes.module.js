@@ -18,6 +18,7 @@ exports.EstudiantesModule = EstudiantesModule = __decorate([
     (0, common_1.Module)({
         controllers: [estudiantes_controller_1.EstudiantesController],
         providers: [estudiantes_service_1.EstudiantesService, prisma_service_1.PrismaService],
+        exports: [estudiantes_service_1.EstudiantesService],
     })
 ], EstudiantesModule);
 //# sourceMappingURL=estudiantes.module.js.map
