@@ -17,17 +17,29 @@ let AppController = class AppController {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async getEstudiantes() {
-        return this.prisma.estudiante.findMany();
+    async testConnection() {
+        try {
+            const count = await this.prisma.estudiante.count();
+            return {
+                message: '✅ Conexión exitosa a la base de datos',
+                estudiantesCount: count
+            };
+        }
+        catch (error) {
+            return {
+                error: '❌ Error de conexión a la base de datos',
+                details: error.message
+            };
+        }
     }
 };
 exports.AppController = AppController;
 __decorate([
-    (0, common_1.Get)('estudiantes'),
+    (0, common_1.Get)('test'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], AppController.prototype, "getEstudiantes", null);
+], AppController.prototype, "testConnection", null);
 exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
