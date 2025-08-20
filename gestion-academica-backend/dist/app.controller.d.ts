@@ -9,8 +9,8 @@ export declare class AppController {
         documento: string;
         correo: string;
         fecha_nacimiento: Date;
-        estado: boolean;
-        creado_en: Date;
-        actualizado_en: Date;
+        estado: boolean | null;
+        creado_en: Date | null;
+        actualizado_en: Date | null;
     }[]>;
 }
