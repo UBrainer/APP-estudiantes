@@ -100,4 +100,125 @@ export declare class EstudiantesController {
         message: string;
         modulosRegistrados: string[];
     }>;
+    registrarConFacade(data: any): Promise<{
+        success: boolean;
+        message: string;
+        data: {
+            id: number;
+            nombre: string;
+            apellido: string;
+            documento: string;
+            correo: string;
+            fecha_nacimiento: Date;
+            estado: boolean | null;
+            creado_en: Date | null;
+            actualizado_en: Date | null;
+        };
+    } | {
+        success: boolean;
+        message: any;
+        data: null;
+    }>;
+    actualizarConFacade(id: string, data: any): Promise<{
+        success: boolean;
+        message: string;
+        data: {
+            id: number;
+            nombre: string;
+            apellido: string;
+            documento: string;
+            correo: string;
+            fecha_nacimiento: Date;
+            estado: boolean | null;
+            creado_en: Date | null;
+            actualizado_en: Date | null;
+        };
+    } | {
+        success: boolean;
+        message: any;
+        data: null;
+    }>;
+    importarConFacade(data: any[]): Promise<{
+        total: number;
+        exitosos: number;
+        fallidos: number;
+        errores: {
+            datos: any;
+            error: string;
+        }[];
+    }>;
+    desactivarConFacade(id: string): Promise<{
+        success: boolean;
+        message: string;
+        data: {
+            id: number;
+            nombre: string;
+            apellido: string;
+            documento: string;
+            correo: string;
+            fecha_nacimiento: Date;
+            estado: boolean | null;
+            creado_en: Date | null;
+            actualizado_en: Date | null;
+        };
+    } | {
+        success: boolean;
+        message: any;
+        data: null;
+    }>;
+    reactivarConFacade(id: string): Promise<{
+        success: boolean;
+        message: string;
+        data: {
+            id: number;
+            nombre: string;
+            apellido: string;
+            documento: string;
+            correo: string;
+            fecha_nacimiento: Date;
+            estado: boolean | null;
+            creado_en: Date | null;
+            actualizado_en: Date | null;
+        };
+    } | {
+        success: boolean;
+        message: any;
+        data: null;
+    }>;
+    buscarAvanzadoConFacade(query: any): Promise<{
+        success: boolean;
+        message: string;
+        data: {
+            id: number;
+            nombre: string;
+            apellido: string;
+            documento: string;
+            correo: string;
+            fecha_nacimiento: Date;
+            estado: boolean | null;
+            creado_en: Date | null;
+            actualizado_en: Date | null;
+        }[];
+        total: number;
+    } | {
+        success: boolean;
+        message: any;
+        data: null;
+        total: number;
+    }>;
+    obtenerEstadisticasConFacade(): Promise<{
+        success: boolean;
+        data: {
+            total: number;
+            activos: number;
+            inactivos: number;
+            porcentajeActivos: number;
+            porcentajeInactivos: number;
+        };
+        message?: undefined;
+    } | {
+        success: boolean;
+        message: any;
+        data: null;
+    }>;
 }

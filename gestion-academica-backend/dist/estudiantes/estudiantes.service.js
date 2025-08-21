@@ -15,13 +15,16 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const search_context_1 = require("./strategies/search.context");
 const search_strategy_1 = require("./strategies/search.strategy");
 const estudiante_mediator_1 = require("./mediators/estudiante.mediator");
+const estudiante_facade_1 = require("./facades/estudiante.facade");
 let EstudiantesService = class EstudiantesService {
     prisma;
     mediator;
+    facade;
     searchContext;
-    constructor(prisma, mediator) {
+    constructor(prisma, mediator, facade) {
         this.prisma = prisma;
         this.mediator = mediator;
+        this.facade = facade;
         const nameStrategy = new search_strategy_1.NameSearchStrategy(prisma);
         const documentStrategy = new search_strategy_1.DocumentSearchStrategy(prisma);
         const emailStrategy = new search_strategy_1.EmailSearchStrategy(prisma);
@@ -180,6 +183,27 @@ let EstudiantesService = class EstudiantesService {
             throw new Error(`Error obteniendo estudiantes activos: ${error.message}`);
         }
     }
+    async registrarEstudianteFacade(data) {
+        return this.facade.registrarEstudiante(data);
+    }
+    async actualizarEstudianteFacade(id, data) {
+        return this.facade.actualizarEstudiante(id, data);
+    }
+    async importarEstudiantesFacade(data) {
+        return this.facade.importarEstudiantes(data);
+    }
+    async desactivarEstudianteFacade(id) {
+        return this.facade.desactivarEstudiante(id);
+    }
+    async reactivarEstudianteFacade(id) {
+        return this.facade.reactivarEstudiante(id);
+    }
+    async buscarAvanzadoFacade(criterios) {
+        return this.facade.buscarEstudianteAvanzado(criterios);
+    }
+    async obtenerEstadisticasFacade() {
+        return this.facade.obtenerEstadisticas();
+    }
     getSearchFields() {
         return this.searchContext.getAvailableSearchFields();
     }
@@ -211,6 +235,7 @@ exports.EstudiantesService = EstudiantesService;
 exports.EstudiantesService = EstudiantesService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        estudiante_mediator_1.EstudianteMediator])
+        estudiante_mediator_1.EstudianteMediator,
+        estudiante_facade_1.EstudianteFacade])
 ], EstudiantesService);
 //# sourceMappingURL=estudiantes.service.js.map

@@ -191,4 +191,70 @@ export class EstudiantesController {
       );
     }
   }
+
+  @Post('facade/registrar')
+  async registrarConFacade(@Body() data: any) {
+    try {
+      return await this.estudiantesService.registrarEstudianteFacade(data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put('facade/actualizar/:id')
+  async actualizarConFacade(@Param('id') id: string, @Body() data: any) {
+    try {
+      return await this.estudiantesService.actualizarEstudianteFacade(Number(id), data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('facade/importar')
+  async importarConFacade(@Body() data: any[]) {
+    try {
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new HttpException('Datos de importación inválidos', HttpStatus.BAD_REQUEST);
+      }
+      return await this.estudiantesService.importarEstudiantesFacade(data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('facade/desactivar/:id')
+  async desactivarConFacade(@Param('id') id: string) {
+    try {
+      return await this.estudiantesService.desactivarEstudianteFacade(Number(id));
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('facade/reactivar/:id')
+  async reactivarConFacade(@Param('id') id: string) {
+    try {
+      return await this.estudiantesService.reactivarEstudianteFacade(Number(id));
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('facade/buscar-avanzado')
+  async buscarAvanzadoConFacade(@Query() query: any) {
+    try {
+      return await this.estudiantesService.buscarAvanzadoFacade(query);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('facade/estadisticas')
+  async obtenerEstadisticasConFacade() {
+    try {
+      return await this.estudiantesService.obtenerEstadisticasFacade();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

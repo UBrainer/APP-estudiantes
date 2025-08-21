@@ -8,6 +8,7 @@ import {
   StatusSearchStrategy 
 } from './strategies/search.strategy';
 import { EstudianteMediator } from './mediators/estudiante.mediator';
+import { EstudianteFacade } from './facades/estudiante.facade';
 
 @Injectable()
 export class EstudiantesService {
@@ -15,7 +16,8 @@ export class EstudiantesService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly mediator: EstudianteMediator
+    private readonly mediator: EstudianteMediator,
+    private readonly facade: EstudianteFacade
   ) {
     const nameStrategy = new NameSearchStrategy(prisma);
     const documentStrategy = new DocumentSearchStrategy(prisma);
@@ -199,6 +201,34 @@ export class EstudiantesService {
     } catch (error) {
       throw new Error(`Error obteniendo estudiantes activos: ${error.message}`);
     }
+  }
+
+  async registrarEstudianteFacade(data: any) {
+    return this.facade.registrarEstudiante(data);
+  }
+
+  async actualizarEstudianteFacade(id: number, data: any) {
+    return this.facade.actualizarEstudiante(id, data);
+  }
+
+  async importarEstudiantesFacade(data: any[]) {
+    return this.facade.importarEstudiantes(data);
+  }
+
+  async desactivarEstudianteFacade(id: number) {
+    return this.facade.desactivarEstudiante(id);
+  }
+
+  async reactivarEstudianteFacade(id: number) {
+    return this.facade.reactivarEstudiante(id);
+  }
+
+  async buscarAvanzadoFacade(criterios: any) {
+    return this.facade.buscarEstudianteAvanzado(criterios);
+  }
+
+  async obtenerEstadisticasFacade() {
+    return this.facade.obtenerEstadisticas();
   }
 
   getSearchFields(): string[] {

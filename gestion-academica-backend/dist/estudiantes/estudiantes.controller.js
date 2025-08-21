@@ -154,6 +154,65 @@ let EstudiantesController = class EstudiantesController {
             throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
         }
     }
+    async registrarConFacade(data) {
+        try {
+            return await this.estudiantesService.registrarEstudianteFacade(data);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async actualizarConFacade(id, data) {
+        try {
+            return await this.estudiantesService.actualizarEstudianteFacade(Number(id), data);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async importarConFacade(data) {
+        try {
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new common_1.HttpException('Datos de importación inválidos', common_1.HttpStatus.BAD_REQUEST);
+            }
+            return await this.estudiantesService.importarEstudiantesFacade(data);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async desactivarConFacade(id) {
+        try {
+            return await this.estudiantesService.desactivarEstudianteFacade(Number(id));
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async reactivarConFacade(id) {
+        try {
+            return await this.estudiantesService.reactivarEstudianteFacade(Number(id));
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async buscarAvanzadoConFacade(query) {
+        try {
+            return await this.estudiantesService.buscarAvanzadoFacade(query);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async obtenerEstadisticasConFacade() {
+        try {
+            return await this.estudiantesService.obtenerEstadisticasFacade();
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 };
 exports.EstudiantesController = EstudiantesController;
 __decorate([
@@ -251,6 +310,55 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], EstudiantesController.prototype, "registrarModuloExterno", null);
+__decorate([
+    (0, common_1.Post)('facade/registrar'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "registrarConFacade", null);
+__decorate([
+    (0, common_1.Put)('facade/actualizar/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "actualizarConFacade", null);
+__decorate([
+    (0, common_1.Post)('facade/importar'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Array]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "importarConFacade", null);
+__decorate([
+    (0, common_1.Post)('facade/desactivar/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "desactivarConFacade", null);
+__decorate([
+    (0, common_1.Post)('facade/reactivar/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "reactivarConFacade", null);
+__decorate([
+    (0, common_1.Get)('facade/buscar-avanzado'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "buscarAvanzadoConFacade", null);
+__decorate([
+    (0, common_1.Get)('facade/estadisticas'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "obtenerEstadisticasConFacade", null);
 exports.EstudiantesController = EstudiantesController = __decorate([
     (0, common_1.Controller)('estudiantes'),
     __metadata("design:paramtypes", [estudiantes_service_1.EstudiantesService])

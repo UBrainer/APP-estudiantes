@@ -14,6 +14,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const search_strategy_1 = require("./strategies/search.strategy");
 const search_context_1 = require("./strategies/search.context");
 const estudiante_mediator_1 = require("./mediators/estudiante.mediator");
+const estudiante_facade_1 = require("./facades/estudiante.facade");
 let EstudiantesModule = class EstudiantesModule {
 };
 exports.EstudiantesModule = EstudiantesModule;
@@ -29,10 +30,12 @@ exports.EstudiantesModule = EstudiantesModule = __decorate([
             search_strategy_1.StatusSearchStrategy,
             search_context_1.SearchContext,
             estudiante_mediator_1.EstudianteMediator,
+            estudiante_facade_1.EstudianteFacade,
         ],
         exports: [
             estudiantes_service_1.EstudiantesService,
             estudiante_mediator_1.EstudianteMediator,
+            estudiante_facade_1.EstudianteFacade,
         ],
     })
 ], EstudiantesModule);

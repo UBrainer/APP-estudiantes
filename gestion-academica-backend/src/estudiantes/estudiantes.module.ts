@@ -10,6 +10,7 @@ import {
 } from './strategies/search.strategy';
 import { SearchContext } from './strategies/search.context';
 import { EstudianteMediator } from './mediators/estudiante.mediator';
+import { EstudianteFacade } from './facades/estudiante.facade';
 
 @Module({
   controllers: [EstudiantesController],
@@ -22,10 +23,12 @@ import { EstudianteMediator } from './mediators/estudiante.mediator';
     StatusSearchStrategy,
     SearchContext,
     EstudianteMediator,
+    EstudianteFacade,
   ],
   exports: [
     EstudiantesService,
     EstudianteMediator,
+    EstudianteFacade,
   ],
 })
 export class EstudiantesModule {}
