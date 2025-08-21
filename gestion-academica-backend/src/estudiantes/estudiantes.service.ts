@@ -7,13 +7,16 @@ import {
   EmailSearchStrategy, 
   StatusSearchStrategy 
 } from './strategies/search.strategy';
+import { EstudianteMediator } from './mediators/estudiante.mediator';
 
 @Injectable()
 export class EstudiantesService {
   private searchContext: SearchContext;
 
-  constructor(private readonly prisma: PrismaService) {
-    // Inicializar estrategias de búsqueda
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mediator: EstudianteMediator
+  ) {
     const nameStrategy = new NameSearchStrategy(prisma);
     const documentStrategy = new DocumentSearchStrategy(prisma);
     const emailStrategy = new EmailSearchStrategy(prisma);
@@ -27,7 +30,6 @@ export class EstudiantesService {
     );
   }
 
-  // CRUD básico
   async findAll() {
     try {
       return await this.prisma.estudiante.findMany({
@@ -62,10 +64,8 @@ export class EstudiantesService {
     fecha_nacimiento: Date;
   }) {
     try {
-      // Validar datos básicos
       this.validarDatosEstudiante(data);
 
-      // Verificar si ya existe el documento o correo
       const existe = await this.prisma.estudiante.findFirst({
         where: {
           OR: [
@@ -79,13 +79,16 @@ export class EstudiantesService {
         throw new Error('Ya existe un estudiante con ese documento o correo');
       }
 
-      // Crear estudiante
-      return await this.prisma.estudiante.create({
+      const estudiante = await this.prisma.estudiante.create({
         data: {
           ...data,
           estado: true,
         }
       });
+
+      await this.mediator.notifyAll('ESTUDIANTE_CREADO', estudiante);
+
+      return estudiante;
     } catch (error) {
       throw new Error(`Error creando estudiante: ${error.message}`);
     }
@@ -93,17 +96,19 @@ export class EstudiantesService {
 
   async update(id: number, data: any) {
     try {
-      // Verificar que el estudiante existe
       const existe = await this.prisma.estudiante.findUnique({ where: { id } });
       if (!existe) {
         throw new Error('Estudiante no encontrado');
       }
 
-      // Actualizar estudiante
-      return await this.prisma.estudiante.update({
+      const estudiante = await this.prisma.estudiante.update({
         where: { id },
         data: { ...data, actualizado_en: new Date() }
       });
+
+      await this.mediator.notifyAll('ESTUDIANTE_ACTUALIZADO', estudiante);
+
+      return estudiante;
     } catch (error) {
       throw new Error(`Error actualizando estudiante: ${error.message}`);
     }
@@ -116,13 +121,14 @@ export class EstudiantesService {
         data: { estado: false, actualizado_en: new Date() }
       });
 
+      await this.mediator.notifyAll('ESTUDIANTE_DESACTIVADO', estudiante);
+
       return { message: 'Estudiante desactivado correctamente', estudiante };
     } catch (error) {
       throw new Error(`Error desactivando estudiante: ${error.message}`);
     }
   }
 
-  // Búsquedas usando Strategy Pattern
   async search(field: string, term: string): Promise<any[]> {
     try {
       return await this.searchContext.executeSearch(field, term);
@@ -150,12 +156,67 @@ export class EstudiantesService {
     }
   }
 
-  // Métodos auxiliares para el frontend
+  async obtenerListaParaModulos() {
+    try {
+      return await this.prisma.estudiante.findMany({
+        where: { estado: true },
+        select: {
+          id: true,
+          nombre: true,
+          apellido: true,
+          documento: true,
+          correo: true
+        }
+      });
+    } catch (error) {
+      throw new Error(`Error obteniendo lista para módulos: ${error.message}`);
+    }
+  }
+
+  async verificarEstudianteExiste(id: number) {
+    try {
+      const estudiante = await this.prisma.estudiante.findUnique({
+        where: { id },
+        select: { id: true, nombre: true, apellido: true, estado: true }
+      });
+
+      return { 
+        existe: !!estudiante, 
+        estudiante,
+        activo: estudiante?.estado || false
+      };
+    } catch (error) {
+      throw new Error(`Error verificando estudiante: ${error.message}`);
+    }
+  }
+
+  async obtenerEstudiantesActivos() {
+    try {
+      return await this.prisma.estudiante.findMany({
+        where: { estado: true },
+        orderBy: { nombre: 'asc' }
+      });
+    } catch (error) {
+      throw new Error(`Error obteniendo estudiantes activos: ${error.message}`);
+    }
+  }
+
   getSearchFields(): string[] {
     return this.searchContext.getAvailableSearchFields();
   }
 
-  // Método de validación básica
+  getMediator(): EstudianteMediator {
+    return this.mediator;
+  }
+
+  async registrarModuloExterno(moduleName: string, module: any): Promise<void> {
+    this.mediator.registerModule(moduleName, module);
+  }
+
+  async obtenerModulosRegistrados(): Promise<string[]> {
+    return this.mediator.getRegisteredModules();
+  }
+
   private validarDatosEstudiante(data: any) {
     const requiredFields = ['nombre', 'apellido', 'documento', 'correo', 'fecha_nacimiento'];
     const missingFields = requiredFields.filter(field => !data[field]);
@@ -164,13 +225,11 @@ export class EstudiantesService {
       throw new Error(`Campos requeridos faltantes: ${missingFields.join(', ')}`);
     }
 
-    // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.correo)) {
       throw new Error('Formato de correo electrónico inválido');
     }
 
-    // Validar que la fecha sea válida
     if (isNaN(new Date(data.fecha_nacimiento).getTime())) {
       throw new Error('Fecha de nacimiento inválida');
     }

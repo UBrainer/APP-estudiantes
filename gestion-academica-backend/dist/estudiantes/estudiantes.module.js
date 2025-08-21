@@ -13,6 +13,7 @@ const estudiantes_controller_1 = require("./estudiantes.controller");
 const prisma_service_1 = require("../prisma/prisma.service");
 const search_strategy_1 = require("./strategies/search.strategy");
 const search_context_1 = require("./strategies/search.context");
+const estudiante_mediator_1 = require("./mediators/estudiante.mediator");
 let EstudiantesModule = class EstudiantesModule {
 };
 exports.EstudiantesModule = EstudiantesModule;
@@ -27,8 +28,12 @@ exports.EstudiantesModule = EstudiantesModule = __decorate([
             search_strategy_1.EmailSearchStrategy,
             search_strategy_1.StatusSearchStrategy,
             search_context_1.SearchContext,
+            estudiante_mediator_1.EstudianteMediator,
         ],
-        exports: [estudiantes_service_1.EstudiantesService],
+        exports: [
+            estudiantes_service_1.EstudiantesService,
+            estudiante_mediator_1.EstudianteMediator,
+        ],
     })
 ], EstudiantesModule);
 //# sourceMappingURL=estudiantes.module.js.map

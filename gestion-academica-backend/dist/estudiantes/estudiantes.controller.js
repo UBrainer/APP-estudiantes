@@ -20,6 +20,52 @@ let EstudiantesController = class EstudiantesController {
     constructor(estudiantesService) {
         this.estudiantesService = estudiantesService;
     }
+    async getAll() {
+        try {
+            return await this.estudiantesService.findAll();
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getOne(id) {
+        try {
+            return await this.estudiantesService.findOne(Number(id));
+        }
+        catch (error) {
+            if (error.message === 'Estudiante no encontrado') {
+                throw new common_1.HttpException(error.message, common_1.HttpStatus.NOT_FOUND);
+            }
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async create(data) {
+        try {
+            return await this.estudiantesService.create(data);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async update(id, data) {
+        try {
+            return await this.estudiantesService.update(Number(id), data);
+        }
+        catch (error) {
+            if (error.message === 'Estudiante no encontrado') {
+                throw new common_1.HttpException(error.message, common_1.HttpStatus.NOT_FOUND);
+            }
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async remove(id) {
+        try {
+            return await this.estudiantesService.remove(Number(id));
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
     async search(campo, termino) {
         try {
             if (!termino) {
@@ -59,8 +105,92 @@ let EstudiantesController = class EstudiantesController {
             throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    async obtenerListaParaModulos() {
+        try {
+            return await this.estudiantesService.obtenerListaParaModulos();
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async verificarExistencia(id) {
+        try {
+            return await this.estudiantesService.verificarEstudianteExiste(Number(id));
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async obtenerActivosParaModulos() {
+        try {
+            return await this.estudiantesService.obtenerEstudiantesActivos();
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async obtenerModulosRegistrados() {
+        try {
+            return await this.estudiantesService.obtenerModulosRegistrados();
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async registrarModuloExterno(body) {
+        try {
+            const mockModule = {
+                notify: async (event, data) => {
+                    console.log(`📨 Módulo ${body.moduleName} recibió:`, { event, data });
+                }
+            };
+            await this.estudiantesService.registrarModuloExterno(body.moduleName, mockModule);
+            return {
+                message: `Módulo ${body.moduleName} registrado exitosamente`,
+                modulosRegistrados: await this.estudiantesService.obtenerModulosRegistrados()
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
 };
 exports.EstudiantesController = EstudiantesController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "getAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "getOne", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "remove", null);
 __decorate([
     (0, common_1.Get)('buscar/:campo'),
     __param(0, (0, common_1.Param)('campo')),
@@ -89,6 +219,38 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EstudiantesController.prototype, "getSearchFields", null);
+__decorate([
+    (0, common_1.Get)('modulo/lista'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "obtenerListaParaModulos", null);
+__decorate([
+    (0, common_1.Get)('modulo/verificar/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "verificarExistencia", null);
+__decorate([
+    (0, common_1.Get)('modulo/activos'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "obtenerActivosParaModulos", null);
+__decorate([
+    (0, common_1.Get)('mediator/modulos'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "obtenerModulosRegistrados", null);
+__decorate([
+    (0, common_1.Post)('mediator/registrar'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EstudiantesController.prototype, "registrarModuloExterno", null);
 exports.EstudiantesController = EstudiantesController = __decorate([
     (0, common_1.Controller)('estudiantes'),
     __metadata("design:paramtypes", [estudiantes_service_1.EstudiantesService])

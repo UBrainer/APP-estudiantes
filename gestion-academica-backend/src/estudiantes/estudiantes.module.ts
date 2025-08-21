@@ -9,6 +9,7 @@ import {
   StatusSearchStrategy 
 } from './strategies/search.strategy';
 import { SearchContext } from './strategies/search.context';
+import { EstudianteMediator } from './mediators/estudiante.mediator';
 
 @Module({
   controllers: [EstudiantesController],
@@ -20,7 +21,11 @@ import { SearchContext } from './strategies/search.context';
     EmailSearchStrategy,
     StatusSearchStrategy,
     SearchContext,
+    EstudianteMediator,
   ],
-  exports: [EstudiantesService],
+  exports: [
+    EstudiantesService,
+    EstudianteMediator,
+  ],
 })
 export class EstudiantesModule {}
